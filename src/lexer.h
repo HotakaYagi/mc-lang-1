@@ -50,22 +50,30 @@ class Lexer {
                 str += lastChar;
                 cont += 1;
               }
-              //char* c_str = str.c_str();
               numval = stoi(str); 
-             // printf("value=%d\n",numval);
               setnumVal(numval);
-              return tok_number;
+              return tok_number;//ここでreturn したら文末のコメントは読み込めないためフラグにした方が良い???
             }
           
             // TODO 1.4: コメントアウトを実装してみよう
             // '#'を読んだら、その行の末尾まで無視をするコメントアウトを実装する。
             // 1. 今の文字(LastChar)が'#'かどうかをチェック
             // 2. lastCharに次のトークンを読み込む(getNextChar(iFile)を使う)
-            // 3. lastCharが'\n'か、EOFになるまで読み込む。e.g. while(lastChar != EOF && lastChar != '\n')
-            // 4. lastCharがEOFでない場合、行末まで読み込んだので次のトークンに進むためにgettok()をreturnする。
+            // 3. lastCharが'\n'か、EOFになるまで読み込む。
+            // e.g. while(lastChar != EOF && lastChar != '\n')
+            // 4. lastCharがEOFでない場合、行末まで読み込んだので次のトークンに進むために
+            // gettok()をreturnする。
             //
             // ここに実装して下さい
-
+            if(lastChar == '#'){
+              lastChar = getNextChar(iFile);
+              while(lastChar != EOF && lastChar != '\n'){ // ||かと思った！！なんでダメ？
+                lastChar = getNextChar(iFile);
+              }
+              if(lastChar != EOF){
+                return gettok();
+              }
+            }
             // EOFならtok_eofを返す
             if (iFile.eof())
                 return tok_eof;

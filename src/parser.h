@@ -129,6 +129,10 @@ static std::unique_ptr<ExprAST> ParseParenExpr() {
     // 4. getNextToken()を呼んでトークンを一つ進め、2で呼んだParseExpressionの返り値を返します。
     //
     // 課題を解く時はこの行を消してここに実装して下さい。
+    getNextToken();
+    ParseExpression();
+    
+
     return nullptr;
 }
 
