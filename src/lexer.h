@@ -17,9 +17,9 @@ class Lexer {
     public:
         // gettok - トークンが数値だった場合はnumValにその数値をセットした上でtok_number
         // を返し、'+'や他のunknown tokenだった場合はそのascii codeを返します。
-        int gettok() {
-            static int lastChar = getNextChar(iFile);
-
+        int gettok() {// static int じゃなくて static char???
+            static char lastChar = getNextChar(iFile);
+            
             // スペースをスキップ
             while (isspace(lastChar))
                 lastChar = getNextChar(iFile);
@@ -40,6 +40,22 @@ class Lexer {
             // 7. このトークンは数値だったので、tok_numberをreturnする。
             //
             // ここに実装して下さい
+            
+            if (isdigit(lastChar) == true){
+              std::string str = "";
+              int numval;
+              str += lastChar;
+              int cont = 0;
+              while((isdigit(lastChar = getNextChar(iFile)) == true) && (cont < 17)){ 
+                str += lastChar;
+                cont += 1;
+              }
+              //char* c_str = str.c_str();
+              numval = stoi(str); 
+              setnumVal(numval);
+              printf("%d\n",numval);
+              return tok_number;
+            }
 
             // TODO 1.4: コメントアウトを実装してみよう
             // '#'を読んだら、その行の末尾まで無視をするコメントアウトを実装する。
