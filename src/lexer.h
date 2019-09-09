@@ -41,22 +41,22 @@ class Lexer {
             //
             // ここに実装して下さい
             
-            if (isdigit(lastChar) == true){
+            if (isdigit(lastChar)){
               std::string str = "";
               int numval;
               str += lastChar;
               int cont = 0;
-              while((isdigit(lastChar = getNextChar(iFile)) == true) && (cont < 17)){ 
+              while((isdigit(lastChar = getNextChar(iFile))) && (cont < 17)){ 
                 str += lastChar;
                 cont += 1;
               }
               //char* c_str = str.c_str();
               numval = stoi(str); 
+             // printf("value=%d\n",numval);
               setnumVal(numval);
-              printf("%d\n",numval);
               return tok_number;
             }
-
+          
             // TODO 1.4: コメントアウトを実装してみよう
             // '#'を読んだら、その行の末尾まで無視をするコメントアウトを実装する。
             // 1. 今の文字(LastChar)が'#'かどうかをチェック
