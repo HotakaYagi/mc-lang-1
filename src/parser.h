@@ -39,6 +39,16 @@ namespace {
             Value *codegen() override;
     };
 
+   // class TerneryAST : public ExprAST {
+   //    char Op;
+   //     std::unique_ptr<ExprAST> LHS, MHS, RHS;
+
+     //   public:
+     //     TerneryAST(char OpR, char OpL, std::unique_ptr<ExprAST> LHS, 
+       //             std::unique_ptr<ExprAST> MHS, std::unique_ptr<ExprAST> RHS)
+      //              : Op1(Op1)
+   // };
+
     // 第一回の課題では関数の定義・呼び出しは扱いませんが、後々のつながりを良くする為と
     // オブジェクトファイルのエントリーポイントを作り"それらしく"するために関数と関数シグネチャー
     // のクラスを作ります。
@@ -130,10 +140,18 @@ static std::unique_ptr<ExprAST> ParseParenExpr() {
     //
     // 課題を解く時はこの行を消してここに実装して下さい。
     getNextToken();
-    ParseExpression();
-    
+    // ParseExpressionの型がよくわからない
+    auto E = ParseExpression();
+    if (E == nullptr){
+      return nullptr;
+    }
+    // ')'だとchar型なのでEとは比べられないとerror、パースしたらCurTokがstaticに更新される？
+    if (CurTok != ')'){
+      LogError("err: If you start with (, you must finish with )");
+    }
+    getNextToken();
 
-    return nullptr;
+    return E;
 }
 
 // ParsePrimary - NumberASTか括弧をパースする関数
@@ -155,32 +173,33 @@ static std::unique_ptr<ExprAST> ParsePrimary() {
 static std::unique_ptr<ExprAST> ParseBinOpRHS(int CallerPrec,
         std::unique_ptr<ExprAST> LHS) {
     // 課題を解く時はこの行を消して下さい。
-    return LHS;
     while (true) {
         // 1. 現在の二項演算子の結合度を取得する。 e.g. int tokprec = GetTokPrecedence();
-
+        int tokprec = GetTokPrecedence();
         // 2. もし呼び出し元の演算子(CallerPrec)よりも結合度が低ければ、ここでは演算をせずにLHSを返す。
         // 例えば、「4*2+3」ではここで'2'が返るはずで、「4+2*3」ではここでは返らずに処理が進み、
         // '2*3'がパースされた後に返る。
-
+        if (tokprec < CallerPrec){
+          return LHS;
+        }
         // 3. 二項演算子をセットする。e.g. int BinOp = CurTok;
-
+        int BinOp = CurTok;
         // 4. 次のトークン(二項演算子の右のexpression)に進む。
-
+        getNextToken();
         // 5. 二項演算子の右のexpressionをパースする。 e.g. auto RHS = ParsePrimary();
-
+        auto RHS = ParsePrimary();
         // GetTokPrecedence()を呼んで、もし次のトークンも二項演算子だった場合を考える。
         // もし次の二項演算子の結合度が今の演算子の結合度よりも強かった場合、ParseBinOpRHSを再帰的に
         // 呼んで先に次の二項演算子をパースする。
-        //int NextPrec = GetTokPrecedence();
-        //if (tokprec < NextPrec) {
-        //    RHS = ParseBinOpRHS(tokprec + 1, std::move(RHS));
-        //    if (!RHS)
-        //        return nullptr;
-        //}
+        int NextPrec = GetTokPrecedence();
+        if (tokprec < NextPrec) {
+            RHS = ParseBinOpRHS(tokprec + 1, std::move(RHS));
+            if (!RHS)
+                return nullptr;
+        }
 
         // LHS, RHSをBinaryASTにしてLHSに代入する。
-        //LHS = llvm::make_unique<BinaryAST>(BinOp, std::move(LHS), std::move(RHS));
+        LHS = llvm::make_unique<BinaryAST>(BinOp, std::move(LHS), std::move(RHS));
     }
 }
 

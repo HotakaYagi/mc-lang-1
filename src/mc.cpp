@@ -33,6 +33,7 @@
 #include <system_error>
 #include <utility>
 #include <vector>
+#include <stdexcept>
 
 using namespace llvm;
 using namespace llvm::sys;
@@ -62,6 +63,19 @@ int main(int argc, char *argv[]) {
     std::string fileName = argv[1];
     lexer.initStream(fileName);
 
+    // compiler option
+    for (int i = 2; i < argc; i++){    
+        std::string option = argv[i];
+
+        if (option == "-fma") {
+            std::cout << "YEAH, We can use FMA" << std::endl;
+        }
+        else if (option == "-inverse"){
+        }
+        else{
+            throw std::invalid_argument( "received invalid option" );
+        }
+    }
     // 二項演算子の定義
     // 数字が低いほど結合度が低い
     BinopPrecedence['+'] = 20;
